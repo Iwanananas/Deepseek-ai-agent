@@ -17,6 +17,7 @@
   --warning: #f59e0b;
   --border-radius: 14px;
   --border-radius-sm: 8px;
+  --border-radius-lg: 24px; /* Added for input field */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.1), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 12px 20px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.05);
@@ -303,7 +304,7 @@ header h1 i {
   border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* Input Area with Floating Effect */
+/* Enhanced Rounded Input Area */
 .input-group {
   display: flex;
   padding: 1rem;
@@ -311,6 +312,8 @@ header h1 i {
   background-color: var(--surface);
   position: relative;
   z-index: 10;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  align-items: center;
 }
 
 [data-theme="dark"] .input-group {
@@ -319,9 +322,9 @@ header h1 i {
 
 .user-input {
   flex: 1;
-  padding: 0.875rem 1rem;
+  padding: 0.875rem 1.25rem;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius-lg); /* Using our larger radius variable */
   font-size: 0.95rem;
   transition: var(--transition);
   background-color: var(--surface-elevated);
@@ -330,6 +333,7 @@ header h1 i {
   min-height: 50px;
   max-height: 150px;
   line-height: 1.5;
+  margin-right: 0.75rem;
 }
 
 [data-theme="dark"] .user-input {
@@ -349,6 +353,33 @@ header h1 i {
 
 .user-input:focus::placeholder {
   color: transparent;
+}
+
+/* Perfectly Round Send Button */
+.btn-send {
+  background-color: var(--primary);
+  color: white;
+  min-width: 50px;
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: var(--transition);
+}
+
+.btn-send:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px) scale(1.05);
+}
+
+.btn-send i {
+  margin-left: 2px;
+  font-size: 1.1rem;
 }
 
 /* Enhanced Button System */
@@ -422,21 +453,6 @@ header h1 i {
 
 [data-theme="dark"] .btn-text:hover {
   background-color: rgba(255, 255, 255, 0.05);
-}
-
-.btn-send {
-  background-color: var(--primary);
-  color: white;
-  margin-left: 0.75rem;
-  min-width: 2.5rem;
-  height: 2.5rem;
-  box-shadow: var(--shadow);
-  align-self: flex-end;
-}
-
-.btn-send:hover:not(:disabled) {
-  background-color: var(--primary-dark);
-  box-shadow: var(--shadow-md);
 }
 
 .btn-auth {
@@ -992,6 +1008,19 @@ header h1 i {
   .settings-content {
     padding: 1.5rem;
   }
+
+  /* Mobile-specific input adjustments */
+  .user-input {
+    border-radius: 20px;
+    padding: 0.75rem 1rem;
+    min-height: 45px;
+  }
+
+  .btn-send {
+    width: 45px;
+    height: 45px;
+    min-width: 45px;
+  }
 }
 
 /* Micro-interactions and delightful details */
@@ -1038,4 +1067,18 @@ textarea:focus-visible {
   .calendar-actions {
     display: none !important;
   }
+}
+
+/* Animation for the send button */
+@keyframes gentlePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.btn-send:not(:disabled):hover {
+  animation: gentlePulse 1.5s infinite;
 }
