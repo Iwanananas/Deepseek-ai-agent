@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Configuration Constants - Set these with your actual values
-    const OPENROUTER_API_KEY = "your-openrouter-api-key-here";
-    const GOOGLE_CLIENT_ID = "your-google-client-id-here";
+    const OPENROUTER_API_KEY = "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";
+    const GOOGLE_CLIENT_ID = "451401714888-6s1lg87mlfmsgakhemn9l1irv024mga5.apps.googleusercontent.com";
     
     // DOM Elements (removed settings-related elements)
     const chatOutput = document.getElementById('chat-output');
