@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI-powered calendar assistant with DeepSeek integration">
+  <title>DeepSeek AI Calendar Assistant</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <h1>
+          <i class="fas fa-robot" aria-hidden="true"></i>
+          <span>DeepSeek AI</span>
+          <span class="badge">BETA</span>
+        </h1>
+        <div class="header-actions">
+          <button id="open-settings-button" class="btn-icon" aria-label="Settings">
+            <i class="fas fa-cog"></i>
+          </button>
+          <button id="auth-button" class="btn-auth">
+            <i class="fab fa-google" aria-hidden="true"></i>
+            <span>Connect Calendar</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-grid">
+      <main class="chat-area">
+        <div class="chat-header">
+          <h2><i class="fas fa-comments"></i> AI Assistant</h2>
+          <div class="chat-actions">
+            <button id="clear-chat-button" class="btn-text">
+              <i class="fas fa-trash-alt"></i> Clear
+            </button>
+            <button id="export-chat-button" class="btn-text">
+              <i class="fas fa-download"></i> Export
+            </button>
+          </div>
+        </div>
+        
+        <div class="chat-container">
+          <div id="chat-output" class="chat-output"></div>
+          <div id="loading-indicator" class="loading-indicator">
+            <span>DeepSeek is thinking</span>
+          </div>
+          <div class="input-group">
+            <input id="user-input" type="text" placeholder="Ask DeepSeek AI something..." 
+                   aria-label="Chat input" autocomplete="off">
+            <button id="send-button" class="btn-send" aria-label="Send message">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar">
+        <div class="calendar-section">
+          <div class="calendar-header">
+            <h2><i class="far fa-calendar-alt"></i> My Schedule</h2>
+            <div class="calendar-actions">
+              <span id="last-sync" class="last-sync"></span>
+              <button id="refresh-calendar" class="btn-icon" aria-label="Refresh calendar">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+          <div id="calendar-events" class="events-list">
+            <div class="empty-state">
+              <i class="far fa-calendar-plus"></i>
+              <p>Connect your calendar to see events</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="settings-modal">
+    <div class="settings-content">
+      <button id="close-settings-button" class="close-settings" aria-label="Close settings">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2><i class="fas fa-sliders-h"></i> Settings</h2>
+      
+      <div class="settings-tabs">
+        <button class="tab-btn active" data-tab="api-settings">API Keys</button>
+        <button class="tab-btn" data-tab="appearance">Appearance</button>
+      </div>
+      
+      <div id="api-settings" class="tab-content active">
+        <div class="settings-group">
+          <div class="setting-item">
+            <label for="api-key-input">
+              <i class="fas fa-key"></i> OpenRouter API Key
+              <span class="hint">(Get it from <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a>)</span>
+            </label>
+            <div class="input-with-action">
+              <input id="api-key-input" type="password" placeholder="sk-or-xxxxxxxxxxxxxxxx" 
+                     autocomplete="off" spellcheck="false">
+              <button class="btn-icon toggle-password" aria-label="Toggle password visibility">
+                <i class="far fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="setting-item">
+            <label for="google-client-id-input">
+              <i class="fab fa-google"></i> Google Client ID
+              <span class="hint">(Required for calendar access)</span>
+            </label>
+            <input id="google-client-id-input" type="text" placeholder="xxxxxxxxxx-xxxxxxxxxxxxxxxx.apps.googleusercontent.com"
+                   autocomplete="off" spellcheck="false">
+          </div>
+          
+          <div class="setting-actions">
+            <button id="save-settings-button" class="btn-save">
+              <i class="fas fa-save"></i> Save Settings
+            </button>
+            <button id="clear-settings-button" class="btn-text">
+              <i class="fas fa-trash"></i> Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div id="appearance" class="tab-content">
+        <div class="settings-group">
+          <div class="setting-item">
+            <label>Theme Preference</label>
+            <div class="theme-options">
+              <button class="theme-option" data-theme="light">
+                <i class="fas fa-sun"></i> Light
+              </button>
+              <button class="theme-option" data-theme="dark">
+                <i class="fas fa-moon"></i> Dark
+              </button>
+              <button class="theme-option active" data-theme="system">
+                <i class="fas fa-desktop"></i> System
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
