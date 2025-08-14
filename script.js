@@ -1,56 +1,45 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
+    // Configuration Constants - Set these with your actual values
+    const OPENROUTER_API_KEY = "your-openrouter-api-key-here";
+    const GOOGLE_CLIENT_ID = "your-google-client-id-here";
+    
+    // DOM Elements (removed settings-related elements)
     const chatOutput = document.getElementById('chat-output');
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
     const authButton = document.getElementById('auth-button');
-    const apiKeyInput = document.getElementById('api-key-input');
-    const googleClientIdInput = document.getElementById('google-client-id-input');
-    const saveSettingsButton = document.getElementById('save-settings-button');
-    const clearSettingsButton = document.getElementById('clear-settings-button');
     const calendarEvents = document.getElementById('calendar-events');
     const clearChatButton = document.getElementById('clear-chat-button');
     const exportChatButton = document.getElementById('export-chat-button');
     const loadingIndicator = document.getElementById('loading-indicator');
-    const settingsModal = document.getElementById('settings-modal');
-    const openSettingsButton = document.getElementById('open-settings-button');
-    const closeSettingsButton = document.getElementById('close-settings-button');
     const refreshCalendarButton = document.getElementById('refresh-calendar');
     const lastSyncElement = document.getElementById('last-sync');
-    const togglePasswordButton = document.querySelector('.toggle-password');
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const themeButtons = document.querySelectorAll('.theme-option');
 
-    // Enhanced Configuration with default values
+    // Configuration with constants
     const defaultConfig = {
-        openRouterApiKey: '',
-        googleClientId: '',
+        openRouterApiKey: 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,
+        googleClientId: 451401714888-6s1lg87mlfmsgakhemn9l1irv024mga5.apps.googleusercontent.com,
         model: 'deepseek-ai/deepseek-r1',
         temperature: 0.7,
         maxTokens: 2000,
         chatHistory: [],
-        theme: 'system'
+        theme: 'system',
+        googleAccessToken: null
     };
 
     let config = { ...defaultConfig };
 
-    // Secure Storage Manager
+    // Secure Storage Manager (only for chat history now)
     const storageManager = {
         setItem: (key, value) => {
             try {
                 localStorage.setItem(key, JSON.stringify(value));
-                setCookie(key, value, 30);
             } catch (e) {
                 console.error('Storage error:', e);
-                showNotification('Storage error - settings not saved', 'error');
             }
         },
         getItem: (key) => {
             try {
-                const cookieValue = getCookie(key);
-                if (cookieValue) return cookieValue;
-                
                 const item = localStorage.getItem(key);
                 return item ? JSON.parse(item) : null;
             } catch (e) {
@@ -60,33 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         clear: () => {
             localStorage.clear();
-            document.cookie.split(';').forEach(cookie => {
-                const eqPos = cookie.indexOf('=');
-                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-                document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-            });
         }
     };
-
-    // Cookie functions with enhanced security
-    function setCookie(name, value, days = 30) {
-        const date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        const expires = "expires=" + date.toUTCString();
-        const secure = window.location.protocol === 'https:' ? ';Secure' : '';
-        document.cookie = `${name}=${encodeURIComponent(value)};${expires};path=/;SameSite=Strict${secure}`;
-    }
-
-    function getCookie(name) {
-        const nameEQ = name + "=";
-        const ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) === ' ') c = c.substring(1);
-            if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length));
-        }
-        return null;
-    }
 
     // Initialize app
     function initApp() {
@@ -101,10 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadConfig() {
         const savedConfig = storageManager.getItem('aiCalendarConfig') || {};
-        config = { ...defaultConfig, ...savedConfig };
-        
-        apiKeyInput.value = config.openRouterApiKey;
-        googleClientIdInput.value = config.googleClientId;
+        // Only load chat history and theme from storage
+        config = { 
+            ...defaultConfig,
+            chatHistory: savedConfig.chatHistory || [],
+            theme: savedConfig.theme || 'system',
+            googleAccessToken: savedConfig.googleAccessToken || null
+        };
     }
 
     function setupEventListeners() {
@@ -121,79 +88,18 @@ document.addEventListener('DOMContentLoaded', () => {
         authButton.addEventListener('click', handleGoogleAuth);
         refreshCalendarButton.addEventListener('click', refreshCalendar);
 
-        // Settings
-        saveSettingsButton.addEventListener('click', saveSettings);
-        clearSettingsButton.addEventListener('click', clearSettings);
-        openSettingsButton.addEventListener('click', openSettings);
-        closeSettingsButton.addEventListener('click', closeSettings);
-        togglePasswordButton.addEventListener('click', togglePasswordVisibility);
-
         // Chat management
         clearChatButton.addEventListener('click', clearChat);
         exportChatButton.addEventListener('click', exportChat);
-
-        // Tab navigation
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => switchTab(button.dataset.tab));
-        });
-
-        // Theme selection
-        themeButtons.forEach(button => {
-            button.addEventListener('click', () => changeTheme(button.dataset.theme));
-        });
-
-        // Close modal when clicking outside
-        settingsModal.addEventListener('click', (e) => {
-            if (e.target === settingsModal) closeSettings();
-        });
-    }
-
-    // Tab functionality
-    function switchTab(tabId) {
-        tabButtons.forEach(button => {
-            button.classList.toggle('active', button.dataset.tab === tabId);
-        });
-        
-        tabContents.forEach(content => {
-            content.classList.toggle('active', content.id === tabId);
-        });
     }
 
     // Theme functionality
-    function changeTheme(theme) {
-        config.theme = theme;
-        storageManager.setItem('aiCalendarConfig', config);
-        applyTheme();
-        
-        themeButtons.forEach(button => {
-            button.classList.toggle('active', button.dataset.theme === theme);
-        });
-    }
-
     function applyTheme() {
         if (config.theme === 'system') {
             document.documentElement.removeAttribute('data-theme');
         } else {
             document.documentElement.setAttribute('data-theme', config.theme);
         }
-    }
-
-    // Password visibility toggle
-    function togglePasswordVisibility() {
-        const isPassword = apiKeyInput.type === 'password';
-        apiKeyInput.type = isPassword ? 'text' : 'password';
-        togglePasswordButton.innerHTML = isPassword ? '<i class="far fa-eye-slash"></i>' : '<i class="far fa-eye"></i>';
-    }
-
-    // Settings modal
-    function openSettings() {
-        settingsModal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeSettings() {
-        settingsModal.style.display = 'none';
-        document.body.style.overflow = '';
     }
 
     // Enhanced Message Handling
@@ -206,8 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         config.chatHistory.push({ role: 'user', content: message });
 
         if (!config.openRouterApiKey) {
-            addMessage("Please enter your OpenRouter API key in settings to use the AI.", 'bot');
-            openSettings();
+            addMessage("Error: API is not properly configured.", 'bot');
             return;
         }
 
@@ -243,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     model: config.model,
                     messages: [
-                        ...config.chatHistory.slice(-6), // Keep last 3 exchanges for context
+                        ...config.chatHistory.slice(-6),
                         { role: 'user', content: message }
                     ],
                     temperature: config.temperature,
@@ -273,8 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Enhanced Google Auth with token refresh
     async function handleGoogleAuth() {
         if (!config.googleClientId) {
-            showNotification('Please enter your Google Client ID in settings first.', 'error');
-            openSettings();
+            showNotification('Error: Google Client ID is not configured.', 'error');
             return;
         }
 
@@ -350,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', `${sender}-message`);
         
-        // Format URLs as clickable links
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         const formattedText = text.replace(urlRegex, url => {
             return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
@@ -482,26 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
         URL.revokeObjectURL(url);
         
         showNotification('Chat exported successfully!', 'success');
-    }
-
-    function saveSettings() {
-        config.openRouterApiKey = apiKeyInput.value.trim();
-        config.googleClientId = googleClientIdInput.value.trim();
-        
-        storageManager.setItem('aiCalendarConfig', config);
-        showNotification('Settings saved successfully!', 'success');
-        closeSettings();
-    }
-
-    function clearSettings() {
-        if (!confirm('Are you sure you want to clear all settings and chat history?')) return;
-        
-        storageManager.clear();
-        config = { ...defaultConfig };
-        apiKeyInput.value = '';
-        googleClientIdInput.value = '';
-        clearChat();
-        showNotification('All settings cleared', 'success');
     }
 
     function checkAuthStatus() {
