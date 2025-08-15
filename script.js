@@ -525,3 +525,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the app
     initApp();
 });
+function clickAppearanceButton() {
+    // Szukamy przycisku z określonymi klasami i atrybutem
+    const button = document.querySelector('button.tab-btn.active[data-tab="appearance"]');
+    
+    if (button) {
+        // Jeśli przycisk został znaleziony, klikamy go
+        button.click();
+        console.log('Przycisk Appearance został kliknięty');
+    } else {
+        // Jeśli przycisk nie został znaleziony, sprawdzamy ponownie po krótkim czasie
+        setTimeout(clickAppearanceButton, 500);
+    }
+}
+
+// Rozpoczynamy obserwację
+clickAppearanceButton();
+
+// Dodatkowo obserwujemy zmiany w DOM, aby wychwycić dynamicznie dodawane elementy
+const observer = new MutationObserver(clickAppearanceButton);
+observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: false,
+    characterData: false
+});
