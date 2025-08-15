@@ -527,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 function clickAppearanceButton() {
     // Szukamy przycisku z określonymi klasami i atrybutem
-    const button = document.querySelector('.tab-btn active');
+    const button = document.querySelector('.tab-btn');
     
     if (button) {
         // Jeśli przycisk został znaleziony, klikamy go
