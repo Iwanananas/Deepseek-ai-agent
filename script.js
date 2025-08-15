@@ -102,9 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadConfig() {
         const savedConfig = storageManager.getItem('aiCalendarConfig') || {};
         config = { ...defaultConfig, ...savedConfig };
-
-        config.openRouterApiKey = "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"
-        config.googleClientId = "451401714888-6s1lg87mlfmsgakhemn9l1irv024mga5.apps.googleusercontent.com"
+        
         apiKeyInput.value = config.openRouterApiKey;
         googleClientIdInput.value = config.googleClientId;
     }
