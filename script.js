@@ -527,26 +527,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 function clickAppearanceButton() {
     // Szukamy przycisku z określonymi klasami i atrybutem
-    const button = document.querySelector('button.tab-btn.active[data-tab="appearance"]');
+    const button = document.querySelector('.tab-btn.active');
     
     if (button) {
         // Jeśli przycisk został znaleziony, klikamy go
         button.click();
-        console.log('Przycisk Appearance został kliknięty');
-    } else {
-        // Jeśli przycisk nie został znaleziony, sprawdzamy ponownie po krótkim czasie
-        setTimeout(clickAppearanceButton, 500);
-    }
+        clearInterval(intervalId); // zatrzymuje interwał
+    } 
 }
 
 // Rozpoczynamy obserwację
 clickAppearanceButton();
 
-// Dodatkowo obserwujemy zmiany w DOM, aby wychwycić dynamicznie dodawane elementy
-const observer = new MutationObserver(clickAppearanceButton);
-observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: false,
-    characterData: false
-});
+const intervalId = setInterval(() => {
+  clickAppearanceButton();
+}, 1000); // 1000 ms = 1 sekunda
